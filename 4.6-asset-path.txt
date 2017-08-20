@@ -1,0 +1,30 @@
+ASSET PATH
+Convert the following scss.erb file to properly reference the asset_path for the image listed in it. Also, try refactoring the scss to use nesting.
+
+h2#newUser {
+  text-indent: -9999px;
+}
+
+h2#newUser a {
+  height: 64px;
+  width: 50px;
+  display: block;
+  background: url(/assets/rails.png) no-repeat;
+}
+
+
+To use asset_path, wrap it in erb tags like you would in a view, like this:
+<%= asset_path('rails.png') %>
+To integrate the erb helper into the background style, you'd do this:
+background: url(<%= asset_path('rails.png') %>) no-repeat;
+The correct answer should be:
+h2#newUser {
+  text-indent: -9999px;
+
+  a {
+    height: 64px;
+    width: 50px;
+    display: block;
+    background: url(<%= asset_path('rails.png') %>) no-repeat;
+  }
+}
