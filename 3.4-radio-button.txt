@@ -1,0 +1,13 @@
+RADIO BUTTON
+Rather than having a weapon that is broken or not, lets instead have a condition field which is either "New", "Rusty", or "Broken". Add a set of radio buttons where the user can select one of these states. Make "New" be checked by default.
+
+To add a radio button use <%= f.radio_button :<column name>, <value> %>
+To make a radio button checked by default use <%= f.radio_button :<column name>, <value>, :checked => true %>
+
+The correct answer
+
+<%= form_for(@weapon) do |f| %>
+  <%= f.radio_button :condition, "New", checked: true %> New
+  <%= f.radio_button :condition, "Rusty" %> Rusty
+  <%= f.radio_button :condition, "Broken" %> Broken
+<% end %>
