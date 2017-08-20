@@ -1,0 +1,4 @@
+RUN MIGRATION
+Enter the command to run the migration you just created.
+
+rails db:migrate
