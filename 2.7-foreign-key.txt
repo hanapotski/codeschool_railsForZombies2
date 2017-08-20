@@ -1,0 +1,10 @@
+FOREIGN KEY
+OH NO! Our Database Admin turned into a Zombie and decided to rename the belongs_to field in our locations table tweeter_id instead of the intelligent default tweet_id. We're going to slay him and correct this, but in the meantime set the foreign_key on both relationships to tweeter_id. Also set the dependency so when a tweet is destroyed, the location is destroyed as well.
+
+class Tweet < ActiveRecord::Base
+  has_one :location, foreign_key: :tweeter_id, dependent: :destroy
+end
+
+class Location < ActiveRecord::Base
+  belongs_to :tweet, foreign_key: :tweeter_id
+end
