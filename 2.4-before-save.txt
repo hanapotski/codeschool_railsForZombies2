@@ -1,0 +1,14 @@
+BEFORE SAVE
+Create a before_save callback that checks to see if a tweet has a location, if it does have a location then set show_location to true.
+Tip: You can check to see if location exists with if self.location?
+
+class Tweet < ActiveRecord::Base
+  before_save :has_location
+
+  def has_location
+    if self.location?
+      self.show_location = true
+    end
+  end
+
+end
