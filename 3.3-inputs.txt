@@ -1,0 +1,14 @@
+INPUTS
+Look at the following database table and create the proper input fields for the columns listed here.
+
+For integer column types you use the number_field view helper
+For boolean column types you use the check_box view helper
+
+The correct answer
+
+
+<%= form_for(@weapon) do |f| %>
+  <%= f.text_field :name %>
+  <%= f.number_field :ammo %>
+  <%= f.check_box :is_broken %>
+<% end %>
