@@ -1,0 +1,14 @@
+ASSET TAGS
+Convert the following to their appropriate asset tags.
+
+<img src="/assets/weapon.png" />
+<script src="/assets/weapon.js" />
+<link href="/assets/weapon.css" media="screen" rel="stylesheet" type="text/css" />
+
+
+For both javascript_include_tag and stylesheet_link_tag, you can just pass in the name of the file, with or without an extension.
+For image_tag, you need to pass in the extension.
+The correct answer should be:
+<%= image_tag "weapon.png" %>
+<%= javascript_include_tag "weapon" %>
+<%= stylesheet_link_tag "weapon" %>
