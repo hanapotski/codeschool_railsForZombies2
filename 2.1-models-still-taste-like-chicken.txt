@@ -1,0 +1,161 @@
+MODELS STILL TASTE LIKE CHICKEN
+
+NAMED SCOPE
+- app/controllers/rotting_zombies_controller.rb
+Zombie.where(rotting: true)
+=> @rotting_zombies = Zombie.rotting
+
+-app/models/zombie.rb
+zombie model:
+scope :rotting, where(rotting: true)
+
+-examples of named scopes
+scope :rotting, where(rotting: true)
+scope :fresh, where("age < 20")
+scope :recent, order("created_at desc").limit(3)
+
+method chaining to create queries:
+Zombie.rotting.limit(5)
+Zombie.recent.rotting
+Zombie.recent.fresh.rotting
+
+CALLBACKS
+
+Objective: When zombie age > 20, set rotting to true
+app/controllers/zombies_controller.rb
+
+=> app/models/zombie.rb
+- before_save :make_rotting
+if age > 20
+  self.rotting = true
+end
+- age vs self, reading attributes doesn't need self, setting attributes needs self
+- refactor
+=> self.rotting = true if age > 20
+
+RETURNING FALSE WILL HALT
+app/models/brain.rb
+- returning false will halt
+
+def taste
+  false => doesn't need return
+end
+- save stops if callback returns false
+b = Brain.new(:flavor => "butter")
+b.save => false
+
+ALL CALLBACKS:
+- inside ActiveRecord model
+before_validation
+after_validation
+
+before_save
+after_save
+
+before_create
+after_create
+
+before_update
+after_update
+
+before_destroy
+after_destroy
+
+1. can use multiple callbacks (even of same type, different before save methods)
+2. if any return false then everything stops (with before then save/destroy isn't done, will not be saved in database)
+example: (in user model)
+after_create :send_welcome_email - after save, send email
+before_save :encrypt_password
+before_destroy :set_deleted_flag - not really delete user in database but have deleted_at_datetime field, inside before destroy, set datetime field return false which will halt destroy from happening, you can call destroy but halt because it will return false
+
+RELATIONSHIPS
+belongs_to
+has_many
+
+has_one
+Objective: A zombie may or may not have a (single) brain
+has a brain, has half, has no brain
+
+rails g model brain zombie_id:integer status:string flavor:string
+- will create migration and model
+
+db/migrate/create_brains.rb
+- will create brains table and columns
+- add foreign_key index, to keep database efficient
+  add_index :brains, :zombie_id
+- rake db:migrate
+
+app/models/brain.rb
+class Brain < ActiveRecord::Base
+  belongs_to :zombie
+end
+
+app/models/zombie.rb
+class Brain < ActiveRecord::Base
+  has_one :brain
+end
+
+- rails console
+- z = Zombie.last
+- z.create_brain(status: "Squashed", flavor: "Mud")
+- z.brain
+
+WHAT HAPPENS WHEN WE DESTROY ZOMBIE?
+z = Zombie.find(1)
+Brain.find(1)
+z.destroy
+Brain.find(1)
+=> railsapi.com - has_one, :dependent option
+has_one :brain, dependent: :destroy
+z  = Zombie.find(1)
+z.destroy => will destroy both zombie and brain
+
+RELATIONSHIP OPTIONS
+dependent: :destroy - will call destroy on associated objects
+foreign_key: :undead_id - changes the associated key (i.e. zombie_id)
+primary_key: :zid - changes the primary key (i.e. id)
+validate: true - when zombie validates brain will too, if validate true on brain when saving zombie it will also validate brain, if not it will not save, it will return false
+
+RELATIONSHIP 'INCLUDE' OPTION
+app/controllers/zombies_controller.rb
+def index
+  @zombies = Zombie.all =>query for each brain, doesn't scale well
+=> @zombies = Zombie.includes(:brain).all
+- more efficient
+
+app/views/zombies/index.html.erb
+zombie.brain.flavor
+
+HAS_MANY :THROUGH
+Objective: A zombie may play multiple roles
+
+Zombie - role_id(x)
+Assignments(table) - role_id, zombie_id
+Role - scout, captain, soldier, brain taster
+
+db/migrate/create_assignments.rb
+add_index :assignments, :zombie_id
+add_index :assignments, :role_id
+
+db/migrate/create_roles.rb
+create_table :roles do |t|
+  t.string :title
+end
+
+app/models/assignment.rb
+belongs_to :zombie
+belongs_to :role
+
+app/models/zombie.rb
+has_many :assignments
+has_many :roles, through: : assignments
+
+app/models/role.rb
+has_many :assignments
+has_many :zombies, through: :assignments
+
+- rails console
+- z = Zombie.last
+- z.roles << Role.find_by_title("Captain") - query roll and insert a row into assignments to represent that
+- << = is a function on Array == z.roles.push
+- z.roles - will do a single query doing inner join on database using assignments and roles tables
