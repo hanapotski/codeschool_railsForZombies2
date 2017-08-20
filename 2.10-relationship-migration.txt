@@ -1,0 +1,20 @@
+HAS MANY THROUGH
+Now that we have our new tables, it's time to define the relationships between each of the models. Define the has_many through relationships in the Tweet & Category model and the belongs_to relationships in the Categorization model.
+
+class Tweet < ActiveRecord::Base
+  has_many :categorizations
+  has_many :categories, through: :categorizations
+end
+
+class Categorization < ActiveRecord::Base
+  belongs_to :tweet
+  belongs_to :category
+end
+
+class Category < ActiveRecord::Base
+  has_many :categorizations
+  has_many :tweets, through: :categorizations
+end
+
+
+http://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html#method-i-has_many
