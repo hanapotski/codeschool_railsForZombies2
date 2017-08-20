@@ -1,0 +1,77 @@
+COFFEESCRIPT
+Instead of returning jQuery which gets executed on the client-side, lets write the ajax request in CoffeeScript communicating with JSON. It should do the same thing as the last challenge, updating & highlighting the ammo, and fading out the form (hint: fade out the wrapper element) if ammo is equal or above 30.
+Tip for your ajax form: data: {ammo_to_reload: ammo}.
+
+$(document).ready ->
+  $('div#reload_form form').submit (event) ->
+    event.preventDefault()
+    url = $(this).attr('action')
+    ammo = $('#ammo_to_reload').val()
+
+    <p id="notice"><%= notice %></p>
+    <ul>
+    <li>
+    <em>Name:</em>
+    <%= @weapon.name %>
+    </li>
+    <li>
+    <em>Condition:</em>
+    <span id="condition"><%= @weapon.condition %></span>
+    <%= link_to "Toggle", toggle_condition_user_weapon_path(@user, @weapon), remote: true %>
+    </li>
+    <li>
+    <em>Ammo:</em>
+    <span id="ammo"><%= @weapon.ammo %></span>
+    </li>
+    </ul>
+    <div id="reload_form">
+    <%= form_for [@user, @weapon], url: reload_user_weapon_path(@user, @weapon), remote:true do |f| %>
+    <div class="field">
+    Number of bullets to reload:
+    <%= number_field_tag :ammo_to_reload, 30 %> <br />
+    <%= f.submit "Reload" %>
+    </div>
+    <% end %>
+    </div>
+    <%= link_to 'Edit', edit_weapon_path(@weapon) %> |
+    <%= link_to 'Back', weapons_path %>
+    view rawshow.html.erb hosted with ❤ by GitHub
+
+
+    class WeaponsController < ApplicationController
+    def reload
+    @weapon = Weapon.find(params[:id])
+    respond_to do |format|
+    if @weapon.ammo < 30
+    @weapon.reload(params[:ammo_to_reload])
+    format.json { render :json => @weapon.to_json(:only => :ammo), status: :ok }
+    format.html { redirect_to @weapon, notice: 'Weapon ammo reloaded' }
+    else
+    format.json { render :json => @weapon.to_json(:only => :ammo), status: :unprocessable_entity }
+    format.html { redirect_to @weapon, notice: 'Weapon not reloaded' }
+    end
+    format.js
+    end
+    end
+    end
+    view rawweapons_controller.rb hosted with ❤ by GitHub
+
+
+    If you need help with CoffeeScript, checkout the documentation.
+Checkout the documentation for the $.ajax jQuery method here.
+A correct answer is:
+$(document).ready ->
+  $('div#reload_form form').submit (event) ->
+    event.preventDefault()
+    form = $(this)
+    url = form.attr('action')
+    ammo = $('#ammo_to_reload').val()
+
+    $.ajax
+      type: 'put'
+      url: url
+      data: {ammo_to_reload: ammo}
+      dataType: 'json'
+      success: (json) ->
+        $('#ammo').text(json.ammo).effect("highlight")
+        $('#reload_form').fadeOut() if json.ammo >= 30    
