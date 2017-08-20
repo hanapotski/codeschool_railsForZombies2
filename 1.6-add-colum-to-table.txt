@@ -1,0 +1,4 @@
+ADD COLUMN TO TABLE
+Enter the command line text to generate a migration called AddPrivacyToTweets which adds a boolean field called private.
+
+rails g migration AddPrivacyToTweets private:boolean
