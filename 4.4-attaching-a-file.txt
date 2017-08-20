@@ -1,0 +1,23 @@
+ATTACHING A FILE
+Change the low_ammo method to include a picture of the weapon that's low on ammo as an attachment. You can name the file weapon.jpg and load the file using weapon.picture_file.
+
+class WeaponMailer < ActionMailer::Base
+  default from: "admin@rfz.com"
+
+  def low_ammo(weapon, zombie)
+    mail to: zombie.email, subject: "#{weapon.name} has low ammo"
+  end
+end
+
+
+Give an email an attachment by assigning a file the attachments hash
+In this case, weapon.picture_file can be directly assigned to an attachment
+The correct answer should be:
+class WeaponMailer < ActionMailer::Base
+  default from: "admin@rfz.com"
+
+  def low_ammo(weapon, zombie)
+    attachments["weapon.jpg"] = weapon.picture_file
+    mail to: zombie.email, subject: "#{weapon.name} has low ammo"
+  end
+end
