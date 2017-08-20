@@ -1,0 +1,4 @@
+ROUTES BE RAKIN
+Please type the rake command you use to list out all the routes on the command line
+
+rake routes
