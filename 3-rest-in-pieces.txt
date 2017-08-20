@@ -1,0 +1,308 @@
+REST IN PIECES
+
+REST
+- Representational State Transfer
+- Roy Fielding, published dissertation in 2000 entitled Architectural and the Design of Network-based Software Architectures
+
+Example of REST
+> HTTP Protocol
+ - resources (noun) - addressable through URI (Uniform Resource Identifiers)
+> Standard methods (verb)
+ - GET, POST, PUT, DELETE (RESTful Web Services)
+
+HOW DID RAILS BECOME RESTFUL?
+app/controllers/users_controller.rb
+- actions all over the place
+1. Lends itself to huge controllers
+2. Multiple models per controller
+
+** best practice to have one resource per controller
+
+
+
+USING PROPER REST
+
+Rails 1
+- Actions - show, create, update, destroy
+- SQL - select, create, update, delete
+- REST - get, post, post, post
+
+Rails 2+
+- Actions - show, create, update, destroy
+- SQL - select, create, update, delete
+- REST - get, post, put, delete
+
+Simplify the URI with proper verbs
+RAILS 1                         RAILS 2+
+Verb    Noun                    Verb     Noun
+GET     /users/show/3           GET      /users/3
+POST    /users/create           POST     /users
+POST    /users/update/3         PUT      /users/3
+POST    /users/destroy/3        DELETE   /users/3
+
+
+REST CHALLENGES
+* Show user = GET User, /users/3
+* Create user = POST User, /users
+* Update user = PUT User, /users/3
+* Destroy user = DELETE User, /users/3
+* Play Global Thermonuclear War = POST GlobalThermoNuclearWar, /global_thermonuclear_wars
+* Process credit card transaction = POST Transaction, /orders/5/credit_card_transactions
+* Subscribe to mailing list = POST Subscription, /mailing_list/5/subscriptions
+* Logout = DELETE Session, /sessions
+
+RESTFUL LINKS
+- to link each action
+- zombie = Zombie.find(2)
+
+#GET /users/3
+def show
+<%= link_to 'show', zombie %>
+
+#POST /users
+def create
+<%= link_to 'create', zombie, method: :post %>
+
+#PUT /users/3
+def update
+<%= link_to 'update', zombie, method: :put %>
+
+#DELETE /users/3
+def destroy
+<%= link_to 'delete', zombie, method: :delete %>
+
+** browsers don't support put and delete
+<%= link_to 'update', zombie, method: :post %>
+<%= link_to 'delete', zombie, method: :post %>
+<a href="/zombies/4" data-method="put" rel="nofollow">update</a>
+<a href="/zombies/4" data-method="delete" rel="nofollow">delete</a>
+
+data-method = HTML5 data attribute
+- Rails creates by unobtrusive JavaScript
+- changes the code to create forms, hide method into hidden input field
+- _method set as method(verb) by Rails
+
+<form method="post" action="/zombies/4">
+  <input name="_method" value="delete" />
+</form>
+
+RAKE ROUTES
+app/config/routes.rb
+resources :zombies
+- creates our RESTful routes
+
+$ rake routes
+- test to list out all routes
+- prints out path names, verbs, URLs, action and controller that gets called
+- paths on left side can be used to figure out what to put in link_to calls
+
+PATH AND URL HELPERS
+- generate relative path to the resource
+zombies_path /zombies
+new_zombies_path /zombies/new
+
+- generate absolute path
+zombies_url http://localhost:3000/zombies
+new_zombie_url http://localhost:3000/zombies/new
+
+
+FORMS AND INPUT HELPERS
+
+CREATING A FORM
+- form_for(@zombie)
+- both create and update zombie form
+
+SUBMIT BUTTON
+- f.submit - submit helper
+- will create submit button, create zombie/ update zombie
+
+TEXT_FILED HELPER
+- f.text_field :name
+- when submitted, will submit request parameters in log
+  :params => {:zombie => {:name => "Eric"}}
+- if saved, value="Eric"
+- if not saved properly, will have validation error, will be wrapped in div with class="field_with_errors"
+
+LABEL HELPER
+- f.label :name
+- will render out <label for="zombie_name">Name</label>
+- @zombie.name validation error will have validation error ^
+
+INPUT HELPERS
+** <%= f.text_area :bio %> Renders a multiline text area
+List of radio buttons (without their labels)
+** <%= f.check_box :rotting %> Check box used for booleans
+** <%= f.radio_button :decomp, 'fresh', checked: true %>
+** <%= f.radio_button :decomp, 'rotting' %>
+** <%= f.radio_button :decomp, 'stale' %>
+Select box with three options
+** <%= f.select :decomp, ['fresh', 'rotting', 'stale'] %>
+Select box with three options, each with a numerical value
+** <%= f.select :decomp, [['fresh', 1], ['rotting', 2], ['stale', 3]] %>
+
+ALTERNATE TEXT INPUT HELPERS type="<field>"
+<%= f.password_field :password %>
+<%= f.number_field :price %>
+<%= f.range_field :quantity %>
+<%= f.email_field :email %>
+<%= f.url_field :website %>
+<%= f.telephone_field :mobile %>
+
+NESTED ROUTES
+app/config/routes.rb
+TwitterForZombies::Application.routes.draw do
+  resources :zombies
+  resources :tweets
+end
+
+/tweets/2
+- find a tweet
+
+/tweets?zombie_id=4
+- find all zombie's tweet
+** not RESTful
+
+TwitterForZombies::Application.routes.draw do
+
+  resources :zombies do
+    resources :tweets
+  end
+
+end
+
+/zombies/4/tweets/2
+- find a tweet
+
+/zombies/4/tweets
+- find all zombie's tweets
+
+** to make this work:
+1. update the controller
+2. update all the links & form_for
+
+UPDATING THE CONTROLLER FOR NESTING
+/zombies/4/tweets/2
+params = {:zombie_id => 4, :id => 2}
+
+class TweetsController < ApplicationController
+  before_filter :get_zombie
+
+  def get_zombie
+    @zombie = Zombie.find(params[:zombie_id])
+  end
+
+  def show
+    @tweet = @zombie.tweets.find(params[:id])
+      ...
+  end
+
+end
+
+/zombies/4/tweets
+params = {:zombie_id => 4}
+- run rake routes
+
+app/views/index.html.erb
+app/views/_form.html.erb
+
+app/controller/tweets_controller.rb
+ - to reflect new route
+ ...
+def create
+  @tweet = weets.new(params[:tweet])
+
+  respond_to do |format|
+    if @tweet.save
+      format.html { redirect_to @tweet ,
+                    notice: 'Tweet was successfully created.' }
+      format.json { render json: @tweet ,
+                    status: :created,
+                    location: @tweet }
+    else
+      format.html { render action: "new" }
+      format.json { render json: @tweet.errors,
+                                 status: :unprocessable_entity }
+      end
+   end
+ end
+
+PARTIALS - HOW WE REUSE VIEW CODE (starts with underscore)
+app/views/tweets/_form.html.erb
+  <%= form_for([@zombie, @tweet]) do |f| %>
+
+app/views/tweets/new.html.erb
+  <h1>New tweet</h1>
+  <%= render 'form' %>
+  <%= link_to 'Back', zombie_tweets_path(@zombie) %>
+
+app/views/tweets/edit.html.erb
+  <h1>Editing tweet</h1>
+  <%= render 'form' %>
+
+VIEW HELPERS - MAKING STRINGS SAFE
+- <script>alert('Hello');</script>
+- &lt;script&gt;
+- user input needs to be escaped
+
+Rails 2
+<%= @tweet.body %> ====> <%= h @tweet.body %>
+unsafe                  safe
+Rails 3
+<%= raw @tweet.body %> ====> <%= @tweet.body %>
+
+Rails 2
+- h command, to escape
+Rails 3
+- default safe, but to print out html commands use raw
+
+ADDITIONAL VIEW HELPERS
+<% @tweets.each do |tweet| %>
+ <div id="tweet_<%= tweet.id %>" class="tweet">
+   <%= tweet.body %>
+ </div>
+<% end %>
+
+** same as
+
+<% @tweets.each do |tweet| %>
+ <%= div_for tweet do %>
+  <%= tweet.body %>
+ <% end %>
+<% end %>
+
+dom_id(@tweet) ===> tweet_2
+
+* div_for helper
+- call dom_id in ActiveRecord object
+- ajax, javascript
+
+* string helper
+<%= truncate("I need brains!", :length => 10) %>
+<%= truncate("I need brains!", :length => 10, :separator => ' ') %>
+- make sure the last character is a space
+
+I see <%= pluralize(Zombie.count, "zombie") %>
+- I see 1 zombie
+- I see 2 zombies
+
+His name was <%= @zombie.name.titleize %>
+His name was Ash Williams
+- active support, to make sure all of the names are titleized
+
+Ash’s zombie roles are <%= @role_names.to_sentence %>
+Ash’s zombie roles are Captain, Soldier, and Brain Taster
+- takes an array and put commas and an and
+
+He was buried alive <%= time_ago_in_words @zombie.created_at %> ago
+He was buried alive 2 days ago
+- for datetime fields
+
+Price is <%= number_to_currency 13.5 %>
+Price is $13.50
+- with money
+
+Ash is <%= number_to_human 13234355423 %> years old
+Ash is 13.2 billion years old
+- with large numbers
+
+** more view helpers - Active Support Core Extensions guides.rubyonrails.org
