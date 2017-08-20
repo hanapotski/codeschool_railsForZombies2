@@ -1,0 +1,7 @@
+GENERATE MAILER
+Enter the command for generating a mailer called WeaponMailer which has the emails low_ammo and broken.
+
+The command for generators always starts with rails generate or rails g for short.
+To generate a mailer: rails g mailer <Mailer Name> <methods>
+The correct answer is
+rails g mailer WeaponMailer low_ammo broken
