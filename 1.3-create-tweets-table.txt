@@ -1,0 +1,12 @@
+CREATE TWEETS TABLE
+Write the migration manually which creates the tweets table in the database with the status string column and zombie_id integer column
+
+
+class CreateTweets < ActiveRecord::Migration
+  def change
+    create_table :tweets do |t|
+      t.string :status
+      t.integer :zombie_id
+    end
+  end
+end
