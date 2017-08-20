@@ -1,0 +1,22 @@
+MORE TO JSON OPTIONS
+Modify the show action so that the JSON it renders includes the zombie record the @weapon belongs to. Also make it exclude the :id, :created_at, and :updated_at fields.
+
+class WeaponsController < ApplicationController
+  def show
+    @weapon = Weapon.find(params[:id])
+    render
+  end
+end
+
+
+To exclude some data in a to_json call, use :except, like this:
+@weapon.to_json(except: [:updated_at, :id, :created_at])
+To include an association in a to_json call, use the :include option, like this:
+@weapon.to_json(except: [:updated_at, :id, :created_at], include: :zombie)
+The correct answer should be:
+class WeaponsController < ApplicationController
+  def show
+    @weapon = Weapon.find(params[:id])
+    render json: @weapon.to_json(except: [:id, :created_at, :updated_at], include: :zombie)
+  end
+end
