@@ -1,0 +1,4 @@
+BOOT IT UP
+Enter the command to start a rails server
+
+rails s
