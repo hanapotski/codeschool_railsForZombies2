@@ -1,0 +1,27 @@
+CUSTOM RESOURCE ROUTES
+Create two custom member routes on the weapons resource, so you have a put method called toggle_condition and a put method called reload.
+
+RailsForZombies::Application.routes.draw do
+  resources :zombies do
+    resources :weapons
+  end
+end
+
+
+To add routes to the :weapons resource pass a block, like this:
+resources :weapons do
+  # custom routes go here
+end
+To add a custom route, call the HTTP method and then pass in the name, like this:
+resources :weapons do
+  put :toggle_condition, on: :member
+end
+The correct answer should be:
+RailsForZombies::Application.routes.draw do
+  resources :zombies do
+    resources :weapons do
+      put :toggle_condition, on: :member
+      put :reload, on: :member
+    end
+  end
+end
