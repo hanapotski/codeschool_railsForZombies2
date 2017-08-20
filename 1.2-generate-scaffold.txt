@@ -1,0 +1,3 @@
+GENERATE SCAFFOLD
+
+rails g scaffold tweet status:string zombie_id:integer
