@@ -1,0 +1,185 @@
+CREATE A RAILS APP
+$ rails new TwitterForZombies
+-will create files and directories >app,view,controller
+
+$ bundle install
+- will download external dependencies the rails app depends on
+
+
+RAILS COMMANDS
+$ cd TwitterforZombies
+rails
+
+generate - generate new code
+console - use to debug
+server - start local development server
+dbconsole - console for database
+
+run with -h for more info
+
+
+RUNNING THE SERVER
+$ rails server
+localhost:3000
+
+$ rails server -h => run server on a different port
+$ rails s => shortcut
+
+
+USING GENERATORS
+$ rails generate
+
+List of generators to use with rails app:
+helper
+mailer
+migration
+model
+scaffold
+
+$ rails g => shortcut
+$ rails g scaffold
+
+scaffold - basic building block for most of rails app - specify a resource and it builds a view to list items, edit items, create new items and delete items
+
+STARTING WITH A SCAFFOLD
+$ rails g scaffold zombie name:string bio:text age:integer
+
+Data/Variable Types:
+string
+text
+integer
+boolean
+decimal
+float
+binary
+date
+time
+datetime
+
+Scaffold
+- will create a lot of files
+- generate migration
+- zombie model
+- add resources zombie.rb to routes
+- create zombies_controller.rb
+- will create views
+- will create helpers, tests and assets
+
+INTRODUCING MIGRATION
+- database migration
+- how we make changes to database from inside rails
+- rails creates a primary key called ID, assumes every table is going to have a primary key of ID
+- t.timestamps = t.datetime :created_at, t.datetime :updated_at
+
+database migration
+- how we version database
+- keep track of changes so we don't have to send around SQL scripts
+
+RUNNING MIGRATIONS
+$ rails s
+error, line, @zombies = Zombies.all =>not yet in database
+
+$ rake db:migrate => rails db:migrate
+- run all missing migrations
+- run current migration and any other migrations other people committed
+
+localhost:3000/zombies
+
+
+RAILS CONSOLE
+- use to debug app
+
+$ rails console
+Zombie.create(name: "Eric Allam", age: 27)
+z = Zombie.first
+z.name = "Caike Souza"
+z.save
+
+
+RUBY 1.9 NEW HASH W/ SYMBOL SYNTAX
+Hash
+- collection of key value pairs(key can be anything: string, integer, symbol)
+- :name => "Eric Allam" == name: "Eric Allam"
+
+app/controller/zombies_controller.rb
+render json: @zombies
+- use Ruby 1.9 syntax
+
+ADDING COLUMNS
+$ rails g migration
+- make changes to database, generate migration
+
+$ rails g migration AddEmailAndRottingToZombies email:string rotting:boolean
+- Add <anything> to <table name> columnname:type
+db/migrate/
+
+migration options: table/column options
+default: <value>
+limit: 30
+null: false - can/can't be null
+first: true
+after: :email
+unique: true - always unique at database level
+
+$ rake db:migrate => rails db:migrate
+- run all missing migrations
+
+$ rake db:rollback
+- look at most recent migration and undo it at the database level
+- rollback previous migration
+- useful if haven't committed migrations and make changes then migrate again
+- useful in deployment to make changes
+
+$ rake db:schema:dump
+- runs automatically everytime db:migrate is run
+- dump the current db state
+
+db/schema.rb
+- authoritative source for db schema
+- migrations start to get brittle after a lot of migration
+- entire database structure
+
+$ rake db:setup
+- when working on an existing app
+- create the db, load schema, & seed
+- create database if it doesn't exist yet
+- run schema and create database using schema file
+- run any seed data needed
+
+MIGRATION COMMANDS
+- remove columns from database
+- remove<anything>from<table name><columnyouwantremoved>
+
+$ rails g migration RemoveAgeFromZombies age:integer
+- will generate migration
+- up = remove_column, down = add_column
+
+migration commands:
+rename_column :zombies, :bio, :description
+rename_table :zombies, :ghouls
+drop_table :zombies
+change_column :zombies, :age, :integer, limit: 4
+change_column_default :zombies, :is_admin, default: true
+
+$ rails g migration DropZombiesTable
+- anything
+- generate up and down methods
+
+** guides.rubyonrails.org => database migrations guide
+
+BUNDLER
+/Gemfile
+- contains all application dependencies
+- bundle install, initially run by 'rails new'
+
+** rubyonrails.org/screencasts/rails3
+** gembundler.com
+
+CONFIGURING YOUR DATABASE
+- rails by default uses sqlite3
+
+/config/database.yml
+- contains database configuration for development, test and production environment
+- replace with another database
+- replace sqlite3 driver with mysql
+- run bundle install
