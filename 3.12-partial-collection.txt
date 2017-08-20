@@ -1,0 +1,53 @@
+PARTIAL COLLECTION
+Refactor the code below to use the _weapon.html.erb partial to render the list of weapons.
+
+<h1><%= @zombie.name %>'s Weapons</h1>
+<% @weapons.each do |weapon| %>
+  <%= div_for weapon do %>
+    <h2><%= weapon.name %></h2>
+    <p>
+      Condition: <%= weapon.condition %>
+      Ammo: <%= weapon.ammo %>
+      Purchased <%= time_ago_in_words weapon.purchased_on %> ago
+    </p>
+  <% end %>
+<% end %>
+
+
+class WeaponsController < ApplicationController
+def index
+@zombie = Zombie.find(params[:zombie_id])
+@weapons = @zombie.weapons
+respond_to do |format|
+format.html # index.html.erb
+format.json { render json: @weapons }
+end
+end
+end
+view rawweapons_controller.rb hosted with ❤ by GitHub
+
+class Zombie < ActiveRecord::Base
+has_many :weapons
+end
+view rawzombie.rb hosted with ❤ by GitHub
+
+
+class Weapon < ActiveRecord::Base
+belongs_to :zombie
+end
+view rawweapon.rb hosted with ❤ by GitHub
+
+
+Move everything inside of the @weapons.each do |weapon| block into _weapon.html.erb
+_weapon.html.erb should be:
+<%= div_for weapon do %>
+  <h2><%= weapon.name %></h2>
+  <p>
+    Condition: <%= weapon.condition %>
+    Ammo: <%= weapon.ammo %>
+    Purchased <%= time_ago_in_words weapon.purchased_on %> ago
+  </p>
+<% end %>
+index.html.erb should be:
+<h1><%= @zombie.name %>'s Weapons</h1>
+<%= render @weapons %>
