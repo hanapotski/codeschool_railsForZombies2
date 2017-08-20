@@ -1,0 +1,6 @@
+SCOPES I
+Write a scope on the Tweet model called recent which returns the 4 most recent tweets. Hint: You'll need an order AND a limit scope.
+
+class Tweet < ActiveRecord::Base
+  scope :recent, order('created_at desc').limit(4)
+end
