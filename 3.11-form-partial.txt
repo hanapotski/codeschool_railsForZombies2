@@ -1,0 +1,42 @@
+FORM PARTIAL
+Refactor the code below to move the form into the _form.html.erb partial.
+
+<h2>New Tweet</h2>
+
+<%= form_for(@tweet) do |f| %>
+  <div class="field">
+    <%= f.label :status %><br />
+    <%= f.text_area :status %>
+  </div>
+
+  <div class="field">
+    <%= f.label :location %><br />
+    <%= f.text_field :location %>
+  </div>
+
+  <%= f.submit %>
+<% end %>
+
+<%= link_to 'back', tweets_path %>
+
+Move the entire form_for block of code into _form.html.erb
+The _form.html.erb partial should be:
+<%= form_for(@tweet) do |f| %>
+  <div class="field">
+    <%= f.label :status %><br />
+    <%= f.text_area :status %>
+  </div>
+
+  <div class="field">
+    <%= f.label :location %><br />
+    <%= f.text_field :location %>
+  </div>
+
+  <%= f.submit %>
+<% end %>
+
+The new.html.erb view should be:
+
+<h2>New Tweet</h2>
+<%= render 'form' %>
+<%= link_to 'back', tweets_path %>
