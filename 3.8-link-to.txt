@@ -1,0 +1,52 @@
+LINK TO
+Now create the proper link_to for when we view a zombie and want to show each of its weapons, and when we want to create a new weapon for this zombie.
+
+<h2><%= @zombie.name %>'s weapons</h2>
+<ul>
+  <% @weapons.each do |w| %>
+    <li><%= link_to w.name, # add show weapon path here %></li>
+  <% end %>
+</ul>
+
+<%= link_to "New Weapon", # add new weapon path here %>
+
+
+class WeaponsController < ApplicationController
+def index
+@zombie = Zombie.find(params[:zombie_id])
+@weapons = @zombie.weapons
+respond_to do |format|
+format.html # index.html.erb
+format.json { render json: @weapons }
+end
+end
+end
+view rawweapons_controller.rb hosted with ❤ by GitHub
+
+
+class Zombie < ActiveRecord::Base
+has_many :weapons
+end
+view rawzombie.rb hosted with ❤ by GitHub
+
+
+class Weapon < ActiveRecord::Base
+belongs_to :zombie
+end
+view rawweapon.rb hosted with ❤ by GitHub
+
+The second argument to link_to becomes the href attribute.
+To generate a url to a weapon's show page, nested under it's zombie, you could do this:
+link_to w.name, [@zombie, w]
+
+A correct answer is
+
+<h2><%= @zombie.name %>'s weapons</h2>
+
+<ul>
+  <% @weapons.each do |w| %>
+    <li><%= link_to w.name, [@zombie, w] %></li>
+  <% end %>
+</ul>
+
+<%= link_to 'New Weapon', new_zombie_weapon_path(@zombie) %>
