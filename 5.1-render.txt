@@ -1,0 +1,28 @@
+RENDER
+Complete the method below so that if the ammo is low it will render the fire_and_reload view, otherwise it should render the fire_weapon view.
+
+class WeaponsController < ApplicationController
+  def fire_weapon
+    @weapon = Weapon.find(params[:id])
+    @weapon.fire!
+
+    if @weapon.low_ammo?
+    end
+
+  end
+end
+
+
+In this case, render will take a single argument that maps to the name of the view.
+If you don't call render, Rails will automatically render the view of the same name as the action
+The correct answer should be:
+class WeaponsController < ApplicationController
+  def fire_weapon
+    @weapon = Weapon.find(params[:id])
+    @weapon.fire!
+
+    if @weapon.low_ammo?
+      render :fire_and_reload
+    end
+  end
+end
