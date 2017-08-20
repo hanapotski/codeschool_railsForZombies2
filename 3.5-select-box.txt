@@ -1,0 +1,17 @@
+SELECT BOX
+Instead of using radio buttons, use a select box for the condition. Refactor the code below:
+
+<%= form_for(@weapon) do |f| %>
+  <%= f.radio_button :condition, "New", checked: true %> New
+  <%= f.radio_button :condition, "Rusty" %> Rusty
+  <%= f.radio_button :condition, "Broken" %> Broken
+<% end %>
+
+To make a select box use
+<%= f.select :<column name>, [<value 1>, <value 2>] %>
+
+The correct answer
+
+<%= form_for(@weapon) do |f| %>
+  <%= f.select :condition, ["Rusty", "Broken", "New"] %>
+<% end %>
