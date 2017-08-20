@@ -13,3 +13,5 @@ class AddTweetCategories < ActiveRecord::Migration
     end
   end
 end
+
+http://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/SchemaStatements.html#method-i-create_table
