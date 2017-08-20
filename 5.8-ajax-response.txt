@@ -1,0 +1,49 @@
+AJAX RESPONSE
+Modify the toggle_condition action so that it responds to JavaScript, and complete the toggle_condition.js.erb using jQuery to update the condition span with the @weapon's changed condition and make it highlight.
+
+class WeaponsController < ApplicationController
+  def toggle_condition
+    @weapon = Weapon.find(params[:id])
+    @weapon.toggle_condition
+
+    respond_to do |format|
+      format.html { redirect_to @weapon, notice: 'Changed condition' }
+    end
+  end
+end
+
+
+
+<p id="notice"><%= notice %></p>
+<ul>
+<li>
+<em>Name:</em>
+<%= @weapon.name %>
+</li>
+<li>
+<em>Condition:</em>
+<span id="condition"><%= @weapon.condition %></span>
+<%= link_to "Toggle", toggle_condition_user_weapon_path(@user, @weapon), remote: true %>
+</li>
+</ul>
+view rawshow.html.erb hosted with ❤ by GitHub
+
+To get an action to respond to an Ajax request, you need to add format.js, like this:
+respond_to do |format|
+  format.html { redirect_to @weapon, notice: 'Changed condition' }
+  format.js
+end
+You can add javascript code with erb tags in toggle_condition.js.erb, like this:
+$('#condition').text("<%= @weapon.condition %>").effect("highlight")
+weapons_controller.rb should be:
+class WeaponsController < ApplicationController
+  def toggle_condition
+    @weapon = Weapon.find(params[:id])
+    @weapon.toggle_condition
+
+    respond_to do |format|
+      format.html { redirect_to @weapon, notice: 'Changed condition' }
+      format.js
+    end
+  end
+end
