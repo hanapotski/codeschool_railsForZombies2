@@ -1,0 +1,27 @@
+COFFEESCRIPTIN
+Use CoffeeScript so when the New Weapon link is pressed it makes the #newWeapon div visible and then hides the New Weapon link. Don't forget to call preventDefault().
+
+$(document).ready ->
+
+
+
+<a href='#' id='displayWeaponForm'>New Weapon</a>
+<div id="newWeapon" style="display:none;">
+<%= form_for [@zombie, Weapon.new] do |f| %>
+<%= f.label :name %><br />
+<%= f.text_area :name %>
+<%= f.submit %>
+<% end %>
+</div>
+view rawindex.html.erb hosted with ❤ by GitHub
+
+If you need help with CoffeeScript, checkout the documentation.
+To attach a click event handler to the displayWeaponForm div, you'd do this:
+$('a#displayWeaponForm').click (event) ->
+  # code goes here
+The correct answer should be:
+$(document).ready ->
+  $('a#displayWeaponForm').click (event) ->
+    $('div#newWeapon').show()
+    $('a#displayWeaponForm').hide()
+    event.preventDefault()
