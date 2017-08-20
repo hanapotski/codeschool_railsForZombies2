@@ -1,0 +1,4 @@
+ROLLBACK MIGRATION
+Assume we ran that last migration. However we forgot a column we wanted to add, could you please roll it back from the command line?
+
+rake db:rollback
