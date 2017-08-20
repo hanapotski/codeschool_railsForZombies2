@@ -1,0 +1,18 @@
+USEFUL VIEW HELPERS
+Modify the following code to make it more pretty, using titleize, to_sentence, pluralize, and number_to_currency (in just that order)
+
+<h2><%= @zombie.name %></h2>
+<p>Weapons: <%= @zombie.weapon_list.join(",") %></p>
+<p><%= @zombie.tweets.size %> Tweets</p>
+<p>Money in Pocket $<%= @zombie.money %>.00</p>
+
+
+Documentation for pluralize, to_sentence, titleize, and number_to_currency
+titleize and to_sentence are both object methods (e.g. 'foo'.titleize), but number_to_currency and pluralize are view helpers.
+
+A correct answer is
+
+<h2><%= @zombie.name.titleize %></h2>
+<p>Weapons: <%= @zombie.weapon_list.to_sentence %></p>
+<p><%= pluralize(@zombie.tweets.size, "Tweet") %></p>
+<p>Money in Pocket <%= number_to_currency @zombie.money %></p>
