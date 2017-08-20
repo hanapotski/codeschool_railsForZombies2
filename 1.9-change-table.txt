@@ -1,0 +1,14 @@
+CHANGE TABLE
+Now that we've rolled back, add a category_name string field and use the rename command to rename the status column to message instead.
+
+class AddLocationToTweets < ActiveRecord::Migration
+  def change
+    add_column :tweets, :location, :string, limit: 30
+    add_column :tweets, :show_location, :boolean, default: false
+    add_column :tweets, :category_name, :string
+    rename_column :tweets, :status, :message
+  end
+end
+
+
+#rename_column <table name>, <old column name>, <new column name>
