@@ -1,0 +1,10 @@
+FORMS
+Create the form for entering tweet status (text_area) and location (text_field) using the appropriate Rails view helpers. All you need is a form_for block, the input helpers, and a submit button.
+
+<h1>New tweet</h1>
+
+<%= form_for(@tweet) do |f| %>
+  <%= f.text_area :status %>
+  <%= f.text_field :location %>
+  <%= f.submit %>
+<% end %>
