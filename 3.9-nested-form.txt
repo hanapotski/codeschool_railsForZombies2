@@ -1,0 +1,45 @@
+NESTED FORM
+Change the form_for below to use the proper nesting for creating a new weapon for a Zombie.
+
+<%= form_for(@weapon) do |f| %>
+  <%= f.text_field :name %>
+
+  <%= f.submit %>
+<% end %>
+
+
+class WeaponsController < ApplicationController
+def new
+@zombie = Zombie.find(params[:zombie_id])
+@weapon = @zombie.weapons.build
+respond_to do |format|
+format.html # new.html.erb
+format.json { render json: @weapon }
+end
+end
+end
+view rawweapons_controller.rb hosted with ❤ by GitHub
+
+
+class Zombie < ActiveRecord::Base
+has_many :weapons
+end
+view rawzombie.rb hosted with ❤ by GitHub
+
+
+class Weapon < ActiveRecord::Base
+belongs_to :zombie
+end
+view rawweapon.rb hosted with ❤ by GitHub
+
+
+Look up the documentation for form_for here.
+In this case, form_for's first argument generates the url the form will post to.
+
+A correct answer is
+
+<%= form_for([@zombie, @weapon]) do |f| %>
+  <%= f.text_field :name %>
+
+  <%= f.submit %>
+<% end %>
