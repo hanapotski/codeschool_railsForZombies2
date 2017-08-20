@@ -1,0 +1,16 @@
+REQUIRING JAVASCRIPTS
+Modify the application.js below adding the calendar.js and color_picker.js libraries after jquery_ujs.
+
+//= require jquery
+//= require jquery_ujs
+//= require_tree .
+
+
+For help with these directives, check out the Rails Guide.
+Make sure and add calendar and color_picker after jquery and jquery_ujs
+The correct answer should be:
+//= require jquery
+//= require jquery_ujs
+//= require calendar
+//= require color_picker
+//= require_tree .
