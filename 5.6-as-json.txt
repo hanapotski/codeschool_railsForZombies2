@@ -1,0 +1,25 @@
+AS JSON
+Edit the as_json method so the Zombie class only returns the zombie's name and weapons (use include). Only return the weapon's name and ammo.
+
+class Zombie < ActiveRecord::Base
+  has_many :weapons
+
+  def as_json(options=nil)
+    super
+  end
+end
+
+
+Lookup the documentation on as_json
+In Zombie#as_json, make sure to call super to hook into the default as_json method.
+def as_json(options=nil)
+  super # add custom options here
+end
+The correct answer should be:
+class Zombie < ActiveRecord::Base
+  has_many :weapons
+
+  def as_json(options=nil)
+    super(options || {only: :name, include: {weapons: {only: [:ammo, :name]}}})
+  end
+end
