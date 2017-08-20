@@ -1,0 +1,8 @@
+INCLUDES
+We're going to be iterating through many tweets and printing out their location. Refactor the controller code below to use the includes method.
+
+class TweetsController < ApplicationController 
+  def index
+    @tweets = Tweet.includes(:location).recent
+  end
+end
