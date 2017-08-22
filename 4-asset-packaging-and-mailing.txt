@@ -1,0 +1,281 @@
+CREATE A ZOMBIE MAILER
+Objective: Create emails for decomposition change and lost brain
+
+$ rails g mailer ZombieMailer decomp_change lost_brain
+
+app/mailers/zombie_mailer.rb
+
+class ZombieMailer < ActionMailer::Base
+ default from: "from@example.com"
+ def decomp_change(zombie)
+   @zombie = zombie
+   @last_tweet = @zombie.tweets.last
+
+   attachments['z.pdf'] = File.read("#{Rails.root}/public/zombie.pdf")
+   mail to: @zombie.email, subject: 'Your decomp stage has changed'
+ end
+ ...
+end
+
+
+MAILER VIEWS
+
+app/views/zombie_mailer/decomp_change.text.erb
+Greetings <%= @zombie.name %>,
+ Your decomposition state is now <%= @zombie.decomp %> and your
+last tweet was: <%= @last_tweet.body %>
+
+Good luck!
+
+
+If you want HTML emails, you just rename text to html
+app/views/zombie_mailer/decomp_change.html.erb
+<h1>Greetings <%= @zombie.name %>,</h1>
+<p>Your decomposition state is now <%= @zombie.decomp %> and your
+last tweet was: <%= @last_tweet.body %></p>
+
+<%= link_to "View yourself", zombie_url(@zombie) %>
+
+
+SENDING MAIL
+app/models/zombie.rb
+class Zombie < ActiveRecord::Base
+  after_save :decomp_change_notification, if: :decomp_changed? //helper method included in ActiveRecord, will return true/false
+
+  private
+
+  def decomp_change_notification //send email
+    ZombieMailer.decomp_change(self).deliver //takes a zombie parameter, inside zombie model
+ end
+end
+
+
+MAD MIMI - email marketing
+Mass mailing is best done outside of Rails. //mailing lists, subscriptions, unsubscriptions, whitelist, blacklist
+- use external service
+madmimi.com
+
+Gemfile gem 'madmimi' then ‘bundle install’
+
+mimi = MadMimi.new('<email>', '<api_key>')
+
+mimi.add_to_list('gregg@envylabs.com' //subscribe
+, 'newsletter')
+
+mimi.remove_from_list('gregg@envylabs.com' //remove from list
+, 'newsletter')
+
+mimi.memberships('gregg@envylabs.com') //list all subscriptions
+
+- in-browser interface for creating newsletters, html email
+
+
+
+ASSET PIPELINE
+
+Rails 3.0
+zombie_twitter
+  public
+    stylesheets
+    javascripts
+    images
+
+Rails 3.1
+zombie_twitter
+  app //specific app code
+    assets
+  lib //my shared code
+    assets
+  vendor //3rd party code
+    assets
+
+assets > stylesheets, javascripts, images
+
+
+ASSET TAG HELPERS
+<%= javascript_include_tag "custom" %>
+  <script src="/assets/custom.js" type="text/javascript"></script>
+
+<%= stylesheet_link_tag "style" %>
+  <link href="/assets/style.css" media="screen"
+                                  rel="stylesheet" type="text/css" />
+
+<%= image_tag "rails.png" %>
+  <img alt="Rails" src="/assets/rails.png" />
+
+In production
+<img alt="Rails" src="/assets/rails-af27b6a414e6da000035031.png"/>
+//fingerprint
+
+
+ASSET PATHS IN STYLESHEETS
+//version each assets and cache better on client-side
+<img alt="Rails" src="/assets/rails-af27b6a414e6da000035031.png" />
+//better client-side caching
+
+app/assets/stylesheets/zombie.css
+form.new_zombie input.submit {
+ background-image: url(/assets/button.png);
+}
+//no caching
+
+app/assets/stylesheets/zombie.css.erb
+form.new_zombie input.submit {
+background-image: url(<%= asset_path('button.png') %>);
+}
+ - asset_path /assets/button-af27b6a414e6da000035031.png
+//add .erb to stylesheets to write rails code like asset_path with fingerprint
+
+
+SCSS - SASSY CSS
+SCSS is an extension to CSS3 adding nested rules, variables, mixins, selector
+inheritance, and more. You get it by default in Rails 3.1.
+//improved version of CSS
+//features nested rules, variables, mixins, selectors, inheritance
+- nesting, DRY
+
+app/assets/stylesheets/zombie.css.scss.erb
+
+form.new_zombie {
+  border: 1px dashed gray;
+
+  .field#bio {
+    display: none;
+  }
+  input.submit {
+  background-image: url(<%= asset_path('button.png') %>);
+  }
+}
+
+COFFEESCRIPT
+CoffeeScript is a programming langugage that compiles into JavaScript.
+You get it by default in Rails 3.1.
+
+app/views/zombies/_form.html.erb
+<%= form_for(@zombie) do |f| %>
+  ...
+  <a href="#" id="bio-toggle">Show Bio Field</a>
+
+  <div class="field" id="bio">
+    <%= f.label :bio %><br />
+    <%= f.text_area :bio %>
+  </div>
+  ...
+<% end %>
+
+Objective: When Show Bio Field is clicked, make bio
+ field appear, and Show link disappear.
+
+jQUERY
+app/assets/javascripts/zombies.js
+$(document).ready(function(){
+  $('#show-bio').click(function(event) {
+    event.preventDefault();
+    $(this).hide();
+    $('.field#bio').show();
+  }
+}
+
+COFFEESCRIPT
+app/assets/javascripts/zombies.js.coffee
+$(document).ready ->
+  $('#show-bio').click (event) ->
+    event.preventDefault()
+    $(this).hide()
+    $('.field#bio').show()
+
+
+REMEMBER THE SCAFFOLD?
+$ rails g scaffold zombie name:string bio:text age:integer
+
+invoke assets
+create app/assets/javascripts/zombies.js.coffee
+invoke scss
+create app/assets/stylesheets/zombies.css.scss
+
+From Gemfile
+gem 'sass-rails'
+gem 'coffee-script'
+
+//TO REMOVE, TAKE THEM OUT
+AND RERUN “BUNDLE INSTALL”
+
+
+THE DEFAULT ASSET GENERATION
+app/assets/javascripts/zombies.js.coffee
+app/assets/javascripts/tweets.js.coffee
+app/assets/javascripts/brains.js.coffee
+app/assets/javascripts/roles.js.coffee
+//put particular actions
+
+Do we need to include each of these files?
+<%= javascript_include_tag "zombies", "tweets", "brains", "roles" %>
+NO, because of the application.js & Sprockets.
+<%= javascript_include_tag "application" %>
+
+In here is a Manifest of the JavaScript libraries we use.
+
+
+SPROCKETS
+In here is a Manifest of the JavaScript libraries we use.
+
+/app/assets/javascripts/application.js
+//= require jquery include the jQuery framework JavaScript
+//= require jquery_ujs include Rails specific unobtrusive JavaScript
+//= require_tree . include all files in this directory
+- go grab all jquery framework and include it in this file, like Ruby include
+- ajax, form conversions for put and delete
+- all javascript files in the directory, assets/javascript directory
+
+Combines all files
+<script src="/assets/application.js" type="text/javascript"></script>
+
+In production
+<script src="/assets/application-af27b6a414e6da000035031.js"
+ type="text/javascript"></script>
+- fingerprint will be added
+
+ To precompile all files into /public/assets/ (on your server)
+ $ rake assets:precompile
+- run in production
+
+ //BY DEFAULT IT MINIFIES ALL CODE
+
+
+REQUIRING OTHER FILES
+lib/assets/javascripts/shared.js.coffee
+vendor/assets/javascripts/friend.js
+
+/app/assets/javascripts/application.js
+//= require jquery
+//= require jquery_ujs
+//= require shared
+//= require friend
+//= require_tree .
+- can be used to specify order
+- shared, friend include in application.js
+
+ASSET STYLESHEETS - sprockets in stylesheets
+/app/assets/stylesheets/application.css
+/*
+ *= require_self  =>Specifies where to insert content in this file
+ *= require_tree .
+*/
+
+form.new_zombie {
+border: 1px dashed gray;
+}
+- INCLUDED BEFORE EVERYTHING ELSE
+/*
+ *= require reset
+ *= require_self
+ *= require_tree .
+*/
+- will compile everything in application.css
+
+<link href="/assets/application.css" media="screen"
+ rel="stylesheet" type="text/css" />
+
+ In production also going to be minified, with fingerprint
+<link href="/assets/application-af27b6414e6da0000.css" media="screen"
+ rel="stylesheet" type="text/css" />
